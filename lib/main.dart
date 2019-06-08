@@ -2,24 +2,43 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:zipypay/Model/currency_model.dart';
+import 'package:flare_splash_screen/flare_splash_screen.dart';
+import './currency_model.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
 }
 
+class MainApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return HomePage(title: "Currency Rates Today");
+  }
+}
+
 class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: HomePage(),
+      title: 'Quick Currecy in Flutter',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: SplashScreen.navigate(
+        name: 'assets/homesplash.flr',
+        next: HomePage(title: 'Currency Viewer'),
+        until: () => Future.delayed(Duration(microseconds: 70)),
+        startAnimation: 'Aura',
       ),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  final String title;
+  HomePage({Key key, this.title}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -71,22 +90,21 @@ class _HomePageState extends State<HomePage>
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text("Currency Rates Today"),
+          title: Text(widget.title),
           centerTitle: true,
           bottom: TabBar(
             controller: tabController,
             tabs: myTabs,
           ),
         ),
-        body: (currencyobj == null)
-            ? CircularProgressIndicator()
-            : TabBarView(
-                controller: tabController,
-                children: <Widget>[
-                  USDRates(rates),
-                  EuroRates(rates)
-                ],
-              ),
+        body: Center(
+          child: (currencyobj == null)
+              ? CircularProgressIndicator()
+              : TabBarView(
+                  controller: tabController,
+                  children: <Widget>[USDRates(rates), EuroRates(rates)],
+                ),
+        ),
       ),
     );
   }
@@ -108,36 +126,60 @@ class _USDRatesState extends State<USDRates> {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Center(
-            child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber) ,),
+            child: Text(
+              "NOK -" + widget.rates.nOK.toString(),
+              style: TextStyle(fontSize: 30, backgroundColor: Colors.amber),
+            ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
       ],
     );
@@ -145,53 +187,76 @@ class _USDRatesState extends State<USDRates> {
 }
 
 class EuroRates extends StatefulWidget {
-final Rates rates;
+  final Rates rates;
 
-EuroRates(this.rates);
+  EuroRates(this.rates);
 
   @override
   _EuroRatesState createState() => _EuroRatesState();
 }
 
 class _EuroRatesState extends State<EuroRates> {
-
   @override
-    Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Center(
-            child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber) ,),
+            child: Text(
+              "NOK -" + widget.rates.nOK.toString(),
+              style: TextStyle(fontSize: 30, backgroundColor: Colors.amber),
+            ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("NOK -" + widget.rates.nOK.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.amber))),
+          child: Center(
+              child: Text("NOK -" + widget.rates.nOK.toString(),
+                  style:
+                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(child: Text("AUD -" + widget.rates.aUD.toString(), style: TextStyle(fontSize: 30,backgroundColor: Colors.black26))),
+          child: Center(
+              child: Text("AUD -" + widget.rates.aUD.toString(),
+                  style: TextStyle(
+                      fontSize: 30, backgroundColor: Colors.black26))),
         ),
       ],
     );
