@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flare_splash_screen/flare_splash_screen.dart';
 import './currency_model.dart';
+import './model_class.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
@@ -45,7 +45,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  int ratescount = 0;
   CurrencyModel currencyobj;
+  ModelClass modelClass;
   var ratesfinal;
   Rates rates;
   String base = "USD";
@@ -71,15 +73,16 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> fetchData() async {
+    print('second function');
     loader = true;
-    String url = createUrl(currency: "EUR");
+    String url = createUrl(currency: "USD");
     jsonData = await http.get(url);
-    databody = jsonDecode(jsonData.body);
-    currencyobj = CurrencyModel.fromJson(databody);
-    rates = currencyobj.rates;
-    //Map userMap = rates;
-    //ratesfinal = new Rates.fromJson(userMap);
-    print(ratesfinal);
+    print(jsonData.body);
+    modelClass = welcomeFromJson(jsonData.body);
+    modelClass.rates.forEach((k, v) {
+      print('${k}: ${v}');
+      ratescount++;
+    });
     loader = false;
     setState(() {});
     return null;
@@ -98,11 +101,14 @@ class _HomePageState extends State<HomePage>
           ),
         ),
         body: Center(
-          child: (currencyobj == null)
+          child: (modelClass == null)
               ? CircularProgressIndicator()
               : TabBarView(
                   controller: tabController,
-                  children: <Widget>[USDRates(rates), EuroRates(rates)],
+                  children: <Widget>[
+                    USDRates(modelClass.rates, ratescount),
+                    EURORates(modelClass.rates, ratescount)
+                  ],
                 ),
         ),
       ),
@@ -111,154 +117,90 @@ class _HomePageState extends State<HomePage>
 }
 
 class USDRates extends StatefulWidget {
-  final Rates rates;
+  final Map<String, double> rates;
+  final int ratescount;
+  var counter;
 
-  USDRates(this.rates);
+  USDRates(this.rates, this.ratescount);
   @override
   _USDRatesState createState() => _USDRatesState();
 }
 
 class _USDRatesState extends State<USDRates> {
+  int selected = 0;
+  _buildRateList() {
+    List<Widget> choices = List();
+    
+    widget.rates.forEach((k, v) {
+      choices.add(
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children : <Widget>[ 
+                Container(
+                  //color: Colors.black26,
+                  child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 30.0),
+                  leading: Text(k.toString()), 
+                  title: Align(child: Text(v.toString()),alignment:Alignment(.5, 0)),                ),
+                ),
+              ]
+            ),
+          )
+            );
+    });
+    return choices;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-            child: Text(
-              "NOK -" + widget.rates.nOK.toString(),
-              style: TextStyle(fontSize: 30, backgroundColor: Colors.amber),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-      ],
-    );
+    return new ListView(
+      children: _buildRateList()
+      );
   }
 }
 
-class EuroRates extends StatefulWidget {
-  final Rates rates;
 
-  EuroRates(this.rates);
+class EURORates extends StatefulWidget {
+  final Map<String, double> rates;
+  final int ratescount;
+  var counter;
 
+  EURORates(this.rates, this.ratescount);
   @override
-  _EuroRatesState createState() => _EuroRatesState();
+  _EURORatesState createState() => _EURORatesState();
 }
 
-class _EuroRatesState extends State<EuroRates> {
+class _EURORatesState extends State<EURORates> {
+  int selected = 0;
+  _buildRateList() {
+    List<Widget> choices = List();
+    
+    widget.rates.forEach((k, v) {
+      choices.add(
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children : <Widget>[ 
+                Container(
+                  color: Colors.black12,
+                  child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 30.0),
+                  leading: Text(k.toString()), 
+                  title: Align(child: Text(v.toString()),alignment:Alignment(.5, 0)),                ),
+                ),
+              ]
+            ),
+          )
+            );
+    });
+    return choices;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-            child: Text(
-              "NOK -" + widget.rates.nOK.toString(),
-              style: TextStyle(fontSize: 30, backgroundColor: Colors.amber),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("NOK -" + widget.rates.nOK.toString(),
-                  style:
-                      TextStyle(fontSize: 30, backgroundColor: Colors.amber))),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-              child: Text("AUD -" + widget.rates.aUD.toString(),
-                  style: TextStyle(
-                      fontSize: 30, backgroundColor: Colors.black26))),
-        ),
-      ],
-    );
+    return new ListView(
+      children: _buildRateList()
+      );
   }
 }
