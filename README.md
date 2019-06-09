@@ -5,5 +5,5 @@ A new Flutter project for showing currency imcomparison to base currency such as
 ## Getting Started
 
 
-## Refernces to Generate Model
+## References to Generate Model
     https://app.quicktype.io

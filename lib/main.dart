@@ -47,11 +47,11 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int ratescount = 0;
   CurrencyModel currencyobj;
-  ModelClass modelClass;
+  ModelClass modelClassUsd, modelClassEuro;
   var ratesfinal;
   Rates rates;
   String base = "USD";
-  var jsonData, databody;
+  var jsonDataUsd,jsonDataEuro, databodyUsd, databodyEuro;
   bool loader = false;
   final List<Tab> myTabs = <Tab>[
     Tab(text: '1 USD'),
@@ -72,17 +72,22 @@ class _HomePageState extends State<HomePage>
     return "https://api.exchangeratesapi.io/latest?base=$currency";
   }
 
+
   Future<void> fetchData() async {
     print('second function');
     loader = true;
     String url = createUrl(currency: "USD");
-    jsonData = await http.get(url);
-    print(jsonData.body);
-    modelClass = welcomeFromJson(jsonData.body);
-    modelClass.rates.forEach((k, v) {
+    jsonDataUsd = await http.get(url);
+    //print(jsonData.body);
+    modelClassUsd = welcomeFromJson(jsonDataUsd.body);
+    url = createUrl(currency: "EUR");
+    jsonDataEuro = await http.get(url);
+    //print(jsonData.body);
+    modelClassEuro = welcomeFromJson(jsonDataEuro.body);
+    /*modelClass.rates.forEach((k, v) {
       print('${k}: ${v}');
       ratescount++;
-    });
+    });*/
     loader = false;
     setState(() {});
     return null;
@@ -101,13 +106,13 @@ class _HomePageState extends State<HomePage>
           ),
         ),
         body: Center(
-          child: (modelClass == null)
+          child: ((modelClassUsd == null) || (modelClassEuro == null) )
               ? CircularProgressIndicator()
               : TabBarView(
                   controller: tabController,
                   children: <Widget>[
-                    USDRates(modelClass.rates, ratescount),
-                    EURORates(modelClass.rates, ratescount)
+                    USDRates(modelClassUsd.rates),
+                    EURORates(modelClassEuro.rates)
                   ],
                 ),
         ),
@@ -118,10 +123,9 @@ class _HomePageState extends State<HomePage>
 
 class USDRates extends StatefulWidget {
   final Map<String, double> rates;
-  final int ratescount;
   var counter;
 
-  USDRates(this.rates, this.ratescount);
+  USDRates(this.rates);
   @override
   _USDRatesState createState() => _USDRatesState();
 }
@@ -154,19 +158,23 @@ class _USDRatesState extends State<USDRates> {
 
   @override
   Widget build(BuildContext context) {
-    return new ListView(
-      children: _buildRateList()
-      );
+    return RefreshIndicator(
+      onRefresh: (){
+        
+      },
+      child: new ListView(
+        children: _buildRateList()
+        ),
+    );
   }
 }
 
 
 class EURORates extends StatefulWidget {
   final Map<String, double> rates;
-  final int ratescount;
   var counter;
 
-  EURORates(this.rates, this.ratescount);
+  EURORates(this.rates);
   @override
   _EURORatesState createState() => _EURORatesState();
 }
